@@ -14,7 +14,7 @@ git clone https://github.com/ternaryinvalid/safenet.git
 
 Daniil Khiznyakov – [@Telegram](https://t.me/dkhizn) - Repository Owner / Developer
 
-Maxim Korobov – [@YourTwitter](https://t.me/mkorobovv) – Contributor / Developer
+Maxim Korobov – [@Telegram](https://t.me/mkorobovv) – Contributor / Developer
 
 ## Contributing
 
