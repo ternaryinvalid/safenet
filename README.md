@@ -16,6 +16,8 @@ git clone https://github.com/ternaryinvalid/safenet.git
 
 * Maxim Korobov – Contributor / Developer
 
+UML говно
+
 ## Contributing
 
 1. Fork it (<https://github.com/ternaryivalid/safenet/fork>)
