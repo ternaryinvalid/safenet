@@ -12,9 +12,9 @@ git clone https://github.com/ternaryinvalid/safenet.git
 
 ## Creators:
 
-Daniil Khiznyakov – [@Telegram](https://t.me/dkhizn) - Repository Owner / Developer
+* Daniil Khiznyakov - Repository Owner / Developer
 
-Maxim Korobov – [@Telegram](https://t.me/mkorobovv) – Contributor / Developer
+* Maxim Korobov – Contributor / Developer
 
 ## Contributing
 
