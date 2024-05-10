@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/ternaryinvalid/safenet/server/internal/app/domain/config"
 	"log"
 	"strings"
+
+	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/ternaryinvalid/safenet/server/internal/app/domain/config"
 )
 
 func New() (config config.Config) {

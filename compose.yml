@@ -2,35 +2,44 @@ version: '3.9'
 
 services:
   client:
+    container_name: client
     build:
       context: ./client
       dockerfile: Dockerfile
     depends_on:
       - server
     ports:
-      - "8081:8081"
+      - "8001:8000"
     networks:
       - app-network
 
   server:
+    container_name: server
+    restart: on-failure
     build:
       context: ./server
       dockerfile: Dockerfile
     depends_on:
       - postgres
     ports:
-      - "8080:8080"
+      - "8081:8080"
     networks:
       - app-network
 
   postgres:
     image: postgres:13.0
+    container_name: pgsql
+    restart: on-failure
     environment:
       POSTGRES_DB: 'messages'
-      POSTGRES_USER: 'messages-user'
-      POSTGRES_PASSWORD: '123457890'
+      POSTGRES_USER: 'user_admin'
+      POSTGRES_PASSWORD: 'admin123'
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./server/migrations/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./data/postgresql:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5588:5432"
     networks:
       - app-network
 

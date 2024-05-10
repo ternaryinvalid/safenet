@@ -9,7 +9,7 @@ adapters:
   secondary:
     providers:
       serverProvider:
-        host: "http://localhost:8080"
+        host: "http://server:8080"
         endpoints:
           messages:
             method: "POST"
