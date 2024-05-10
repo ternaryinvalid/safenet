@@ -1,0 +1,20 @@
+application:
+  name: "safe-net-server"
+  version: "1.0.0"
+
+adapters:
+  primary:
+    server:
+      port: ":8080"
+  secondary:
+    databases:
+      messages:
+        host: "MESSAGES_HOST"
+        port: "MESSAGES_PORT"
+        type: "postgres"
+        name: "messages"
+        user: "MESSAGES_USER"
+        password: "MESSAGES_PASSWORD"
+        procedures:
+          getMessages: "messages.get_messages"
+          saveMessage: "messages.save_message"

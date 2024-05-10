@@ -11,7 +11,7 @@ services:
     ports:
       - "8001:8001"
     networks:
-      - my-network
+      - app-network
 
   server:
     build:
@@ -22,7 +22,7 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - my-network
+      - app-network
 
   postgres:
     image: postgres:13.0
@@ -33,8 +33,8 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - my-network
+      - app-network
 
 networks:
-  my-network:
+  app-network:
     driver: bridge
