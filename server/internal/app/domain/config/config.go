@@ -31,10 +31,10 @@ type Databases struct {
 
 type Database struct {
 	Type       string            `yaml:"type"`
-	Host       string            `env:"MESSAGES_HOST"     env-required:"true" yaml:"host"`
-	Port       string            `env:"MESSAGES_PORT"     env-required:"true" yaml:"port"`
-	User       string            `env:"MESSAGES_USER"     env-required:"true" yaml:"user"`
-	Password   string            `env:"MESSAGES_PASSWORD" env-required:"true" yaml:"password"`
+	Host       string            `yaml:"host"`
+	Port       string            `yaml:"port"`
+	User       string            `yaml:"user"`
+	Password   string            `yaml:"password"`
 	Name       string            `yaml:"name"`
 	Procedures map[string]string `yaml:"procedures"`
 }

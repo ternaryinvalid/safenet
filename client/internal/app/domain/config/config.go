@@ -30,7 +30,7 @@ type Providers struct {
 }
 
 type ServerProvider struct {
-	Host      string                  `env:"FILE_CONVERTER_HOST"          env-required:"true" yaml:"host"`
+	Host      string                  `yaml:"host"`
 	Endpoints ServerProviderEndpoints `yaml:"endpoints"`
 }
 

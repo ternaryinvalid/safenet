@@ -9,12 +9,12 @@ adapters:
   secondary:
     databases:
       messages:
-        host: "MESSAGES_HOST"
-        port: "MESSAGES_PORT"
+        host: "host"
+        port: "port"
         type: "postgres"
         name: "messages"
-        user: "MESSAGES_USER"
-        password: "MESSAGES_PASSWORD"
+        user: "messages-user"
+        password: "messages-password"
         procedures:
           getMessages: "messages.get_messages"
           saveMessage: "messages.save_message"

@@ -9,7 +9,7 @@ import (
 )
 
 func New() (config config.Config) {
-	err := cleanenv.ReadConfig("./config.yml", &config)
+	err := cleanenv.ReadConfig("/bin/config.yml", &config)
 	if err != nil {
 		err = fmt.Errorf(strings.ReplaceAll(err.Error(), ", ", ",\n"))
 		log.Fatal(err)

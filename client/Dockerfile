@@ -1,16 +1,22 @@
-FROM golang:alpine as builder
-WORKDIR /build
+ARG GO_VERSION=1.21
+FROM golang:${GO_VERSION} AS build
+
+WORKDIR /src
 
 COPY go.mod .
 
 RUN go mod download
 
-COPY deploy .
+COPY . .
 
-RUN CGO_ENABLED=0 go build -o /main main.go
+RUN CGO_ENABLED=0 go build -o /bin/client main.go
 
-FROM scratch
+COPY ./config.yml /bin/config.yml
 
-COPY --from=builder main /bin/main
+FROM alpine:latest AS final
 
-ENTRYPOINT ["/bin/main"]
+COPY --from=build /bin/client /bin/
+COPY --from=build /bin/config.yml /bin/config.yml
+
+EXPOSE 8081
+ENTRYPOINT [ "/bin/client" ]

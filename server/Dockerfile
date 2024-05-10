@@ -1,19 +1,22 @@
-FROM golang:alpine AS builder
+ARG GO_VERSION=1.21
+FROM golang:${GO_VERSION} AS build
 
-WORKDIR /build
+WORKDIR /src
 
-ADD go.mod .
+COPY go.mod .
 
-COPY deploy .
+RUN go mod download
 
-RUN go build -o server main.go
+COPY . .
 
-FROM alpine
+RUN CGO_ENABLED=0 go build -o /bin/server main.go
 
-WORKDIR /build
+COPY ./config.yml /bin/config.yml
 
-COPY --from=builder /build/server build/server
+FROM alpine:latest AS final
 
-EXPOSE 8080
+COPY --from=build /bin/server /bin/
+COPY --from=build /bin/config.yml /bin/config.yml
 
-CMD [". /server"]
+EXPOSE 8081
+ENTRYPOINT [ "/bin/server" ]
