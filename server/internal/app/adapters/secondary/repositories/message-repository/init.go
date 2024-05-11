@@ -1,13 +1,16 @@
 package message_repository
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
+	"log"
+	"os"
+	"time"
+
+	sql "github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ternaryinvalid/safenet/server/internal/app/domain/config"
 	"github.com/ternaryinvalid/safenet/server/internal/pkg/repohelpers"
-	"log"
-	"os"
 )
 
 type MessageRepository struct {
@@ -27,10 +30,10 @@ func New(cfg config.Database) *MessageRepository {
 		log.Fatal(err.Error())
 	}
 
-	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	//defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	err = db.Ping()
+	err = db.PingContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
 

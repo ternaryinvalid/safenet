@@ -1,12 +1,13 @@
 package http_adapter
 
 import (
+	"net/http"
+	"time"
+
 	api_controller "github.com/ternaryinvalid/safenet/server/internal/app/adapters/primary/http-adapter/api-controller"
 	"github.com/ternaryinvalid/safenet/server/internal/app/adapters/primary/http-adapter/router"
 	"github.com/ternaryinvalid/safenet/server/internal/app/application"
 	"github.com/ternaryinvalid/safenet/server/internal/app/domain/config"
-	"net/http"
-	"time"
 )
 
 const (
