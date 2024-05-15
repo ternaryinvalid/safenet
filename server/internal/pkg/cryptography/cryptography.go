@@ -3,14 +3,16 @@ package cryptography
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"io"
 )
 
-func Encrypt(key []byte, message []byte) (string, error) {
-	block, err := aes.NewCipher(key)
+func Encrypt(sharedKey []byte, message []byte) (string, error) {
+	block, err := aes.NewCipher(sharedKey)
 	if err != nil {
 		err = fmt.Errorf("ошибка создания шифра: %v", err)
 
@@ -34,8 +36,8 @@ func Encrypt(key []byte, message []byte) (string, error) {
 	return hex.EncodeToString(ciphertext), nil
 }
 
-func Decrypt(key []byte, cipheredMessage []byte) (string, error) {
-	block, err := aes.NewCipher(key)
+func Decrypt(sharedKey []byte, cipheredMessage []byte) (string, error) {
+	block, err := aes.NewCipher(sharedKey)
 	if err != nil {
 		err = fmt.Errorf("ошибка создания шифра: %v", err)
 
@@ -62,4 +64,21 @@ func Decrypt(key []byte, cipheredMessage []byte) (string, error) {
 	mode.CryptBlocks(decodedCiphertext, decodedCiphertext)
 
 	return string(decodedCiphertext), nil
+}
+
+func GetSharedKey(remotePublicKey []byte, localPrivateKey *ecdsa.PrivateKey) []byte {
+	x, y := elliptic.P256().ScalarBaseMult(remotePublicKey)
+
+	sharedSecret, _ := elliptic.P256().ScalarMult(x, y, localPrivateKey.D.Bytes())
+
+	return sharedSecret.Bytes()
+}
+
+func GenerateKeys() ([]byte, *ecdsa.PrivateKey, error) {
+	localPrivateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return localPrivateKey.PublicKey.X.Bytes(), localPrivateKey, nil
 }

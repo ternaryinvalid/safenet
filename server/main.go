@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ternaryinvalid/safenet/server/internal/app/adapters/secondary/repositories/cache"
 	"log"
 
 	http_adapter "github.com/ternaryinvalid/safenet/server/internal/app/adapters/primary/http-adapter"
@@ -15,7 +16,9 @@ func main() {
 
 	messagesRepository := message_repository.New(config.Adapters.Secondary.Databases.Messages)
 
-	app := application.New(config.Application, messagesRepository)
+	cache := cache.New()
+
+	app := application.New(config.Application, messagesRepository, cache)
 
 	httpAdapter := http_adapter.New(config.Adapters.Primary.HttpAdapter, app)
 
@@ -25,6 +28,7 @@ func main() {
 
 	go osSignal.Start()
 
+	// Graceful shutdown
 	select {
 	case err := <-httpAdapter.Notify():
 		log.Println(err.Error(), "main")

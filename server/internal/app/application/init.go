@@ -10,6 +10,7 @@ import (
 type Application struct {
 	cfg               config.Application
 	messageRepository messageRepository
+	cache             cache
 }
 
 type messageRepository interface {
@@ -17,9 +18,18 @@ type messageRepository interface {
 	GetMessages(ctx context.Context, request entity.GetMessagesDTO) (messages []entity.Message, err error)
 }
 
-func New(cfg config.Application, messageRepository messageRepository) *Application {
+type cache interface {
+	GetShared(publicKey string) (string, error)
+	SaveShared(remotePublicKey, sharedSecret string)
+	SetSecret(localPublicKey, localPrivateKey string)
+	IsEmpty() bool
+	GetSecret() string
+}
+
+func New(cfg config.Application, messageRepository messageRepository, cache cache) *Application {
 	return &Application{
 		cfg:               cfg,
 		messageRepository: messageRepository,
+		cache:             cache,
 	}
 }

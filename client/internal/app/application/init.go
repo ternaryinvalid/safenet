@@ -1,20 +1,35 @@
 package application
 
-import "github.com/ternaryinvalid/safenet/client/internal/app/domain/config"
+import (
+	"context"
+	"github.com/ternaryinvalid/safenet/client/internal/app/domain/config"
+	"github.com/ternaryinvalid/safenet/client/internal/app/domain/entity"
+)
 
 type Application struct {
-	cfg            config.Application
-	serverProvider serverProvider
+	cfg             config.Application
+	serverProvider  serverProvider
+	cacheRepository cacheRepository
 }
 
 type serverProvider interface {
-	SendMessage(key []byte, message []byte) error
-	GetMessages(key []byte) ([][]byte, error)
+	SendMessage(ctx context.Context, request entity.SaveMessageDTO) (int64, error)
+	GetMessages(ctx context.Context, request entity.GetMessagesDTO) ([]entity.Message, error)
+	GenerateKeys(ctx context.Context, request entity.GenerateKeysDTO) (entity.GenerateKeysDTO, error)
 }
 
-func New(cfg config.Application, serverProvider serverProvider) *Application {
+type cacheRepository interface {
+	SaveShared(remotePublicKey, sharedSecret string)
+	GetShared(publicKey string) (string, error)
+	SetSecret(localPublicKey, localPrivateKey string)
+	IsEmpty() bool
+	Public() string
+}
+
+func New(cfg config.Application, serverProvider serverProvider, cacheRepository cacheRepository) *Application {
 	return &Application{
-		cfg:            cfg,
-		serverProvider: serverProvider,
+		cfg:             cfg,
+		serverProvider:  serverProvider,
+		cacheRepository: cacheRepository,
 	}
 }

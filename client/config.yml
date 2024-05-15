@@ -17,3 +17,6 @@ adapters:
           send:
             method: "POST"
             path: "/api/v1/send"
+          gen:
+            method: "POST"
+            path: "/api/v1/gen-keys"

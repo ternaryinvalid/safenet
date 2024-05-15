@@ -15,5 +15,17 @@ func (repo *MessageRepository) createQuerySaveMessage(req entity.SaveMessageDTO)
 func (repo *MessageRepository) createQueryGetMessages(req entity.GetMessagesDTO) (string, []interface{}) {
 	procedure := repo.cfg.Procedures["getMessages"]
 
-	return fmt.Sprintf(`SELECT * FROM %s($1, $2)`, procedure), []interface{}{req.MessageTo, req.Limit}
+	return fmt.Sprintf(`SELECT * FROM %s($1, $2)`, procedure), []interface{}{req.MessageTo, *req.Limit}
+}
+
+func (repo *MessageRepository) createQuerySaveKeys(shared, private string) (string, []interface{}) {
+	procedure := repo.cfg.Procedures["saveKeys"]
+
+	return fmt.Sprintf(`SELECT * FROM %s($1, $2)`, procedure), []interface{}{shared, private}
+}
+
+func (repo *MessageRepository) createQueryGetShared() string {
+	procedure := repo.cfg.Procedures["getShared"]
+
+	return fmt.Sprintf(`SELECT * FROM %s()`, procedure)
 }

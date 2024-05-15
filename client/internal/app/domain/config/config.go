@@ -37,6 +37,7 @@ type ServerProvider struct {
 type ServerProviderEndpoints struct {
 	Messages Endpoint `yaml:"messages"`
 	Send     Endpoint `yaml:"send"`
+	GenKeys  Endpoint `yaml:"gen"`
 }
 
 type Endpoint struct {

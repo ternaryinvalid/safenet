@@ -21,7 +21,7 @@ type MessageRepository struct {
 func New(cfg config.Database) *MessageRepository {
 	currentHostString := fmt.Sprintf("DB host [%s:%s]. ", cfg.Host, cfg.Port)
 
-	log.Println(currentHostString, "CONNECTING...")
+	log.Println(currentHostString, "Connecting...")
 
 	connectionString := repohelpers.GetConnectionString(cfg.Type, cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Name)
 
@@ -40,7 +40,7 @@ func New(cfg config.Database) *MessageRepository {
 		os.Exit(1)
 	}
 
-	log.Println(currentHostString, "CONNECTED!")
+	log.Println(currentHostString, "Connected!")
 
 	return &MessageRepository{
 		cfg: cfg,

@@ -30,7 +30,7 @@ func New(config config.HttpAdapter, app *application.Application) *HttpAdapter {
 
 	controller := api_controller.New(app)
 
-	r.AppendRoutes(controller)
+	r.AppendRoutesV1(controller)
 
 	router := r.Router()
 

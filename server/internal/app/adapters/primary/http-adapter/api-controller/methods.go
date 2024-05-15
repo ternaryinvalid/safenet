@@ -109,10 +109,64 @@ func (ctr *ApiController) GetMessages(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (ctr *ApiController) GenerateKeys(w http.ResponseWriter, r *http.Request) {
+	var dtoIn GenerateKeysDTO
+
+	err := json.NewDecoder(r.Body).Decode(&dtoIn)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		_, writeErr := w.Write([]byte(fmt.Sprintf("error: %v", err)))
+		if writeErr != nil {
+			log.Println(writeErr)
+
+			return
+		}
+
+		return
+	}
+
+	ctx := r.Context()
+
+	publicKey, err := ctr.app.GenerateKeys(ctx, []byte(dtoIn.PublicKey))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		_, writeErr := w.Write([]byte(fmt.Sprintf("error: %v", err)))
+		if writeErr != nil {
+			log.Println(writeErr)
+
+			return
+		}
+
+		return
+	}
+
+	dtoOut := GenerateKeysDTO{PublicKey: string(publicKey)}
+
+	err = json.NewEncoder(w).Encode(dtoOut)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		_, writeErr := w.Write([]byte(fmt.Sprintf("error: %v", err)))
+		if writeErr != nil {
+			log.Println(writeErr)
+
+			return
+		}
+
+		return
+	}
+}
+
 type GetMessagesResponse struct {
 	Messages []entity.Message `json:"messages"`
 }
 
 type SaveMessageResponse struct {
 	MessageId int64 `json:"message_id"`
+}
+
+type GenerateKeysDTO struct {
+	PublicKey string `json:"public_key"`
 }

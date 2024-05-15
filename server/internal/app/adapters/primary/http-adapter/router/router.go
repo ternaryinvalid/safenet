@@ -35,7 +35,7 @@ const (
 	apiV1Prefix = "/api/v1"
 )
 
-func (r *Router) AppendRoutes(controller *api_controller.ApiController) {
+func (r *Router) AppendRoutesV1(controller *api_controller.ApiController) {
 	apiV1Subrouter := r.router.PathPrefix(apiV1Prefix).Subrouter()
 
 	routes := []Route{
@@ -50,6 +50,12 @@ func (r *Router) AppendRoutes(controller *api_controller.ApiController) {
 			Path:    "/send",
 			Method:  http.MethodPost,
 			Handler: http.HandlerFunc(controller.SendMessage),
+		},
+		{
+			Name:    "generate keys",
+			Path:    "/generate-keys",
+			Method:  http.MethodGet,
+			Handler: http.HandlerFunc(controller.GenerateKeys),
 		},
 	}
 
