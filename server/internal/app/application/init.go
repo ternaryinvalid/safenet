@@ -19,8 +19,8 @@ type messageRepository interface {
 }
 
 type cache interface {
-	GetShared(publicKey string) (string, error)
-	SaveShared(remotePublicKey, sharedSecret string)
+	GetShared() (string, error)
+	SaveShared(sharedSecret string)
 	SetSecret(localPublicKey, localPrivateKey string)
 	IsEmpty() bool
 	GetSecret() string

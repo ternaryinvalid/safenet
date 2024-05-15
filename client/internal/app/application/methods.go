@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"github.com/ternaryinvalid/safenet/client/internal/app/domain/entity"
 	"github.com/ternaryinvalid/safenet/client/internal/pkg/cryptography"
 )
@@ -36,6 +37,12 @@ func (app *Application) SendMessage(ctx context.Context, request entity.SaveMess
 }
 
 func (app *Application) GetMessages(ctx context.Context, request entity.GetMessagesDTO) ([]entity.Message, error) {
+	if app.cacheRepository.IsEmpty() {
+		err := fmt.Errorf("нет транспортного ключа")
+
+		return nil, err
+	}
+
 	messages, err := app.serverProvider.GetMessages(ctx, request)
 	if err != nil {
 		return nil, err
@@ -50,7 +57,7 @@ func (app *Application) GetMessages(ctx context.Context, request entity.GetMessa
 	if !deciphered {
 		messagesDeciphered := make([]entity.Message, 0)
 
-		sharedKey, err := app.cacheRepository.GetShared(request.MessageTo)
+		sharedKey, err := app.cacheRepository.GetShared()
 		if err != nil {
 			return nil, err
 		}
@@ -94,7 +101,7 @@ func (app *Application) generateKeys(ctx context.Context) ([]byte, error) {
 
 	shared := cryptography.GetSharedKey([]byte(remotePublicKey.PublicKey), localPrivateKey)
 
-	app.cacheRepository.SaveShared(remotePublicKey.PublicKey, string(shared))
+	app.cacheRepository.SaveShared(string(shared))
 	app.cacheRepository.SetSecret(string(localPublicKey), string(localPrivateKey.D.Bytes()))
 
 	return shared, nil

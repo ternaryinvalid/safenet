@@ -19,8 +19,8 @@ type serverProvider interface {
 }
 
 type cacheRepository interface {
-	SaveShared(remotePublicKey, sharedSecret string)
-	GetShared(publicKey string) (string, error)
+	SaveShared(sharedSecret string)
+	GetShared() (string, error)
 	SetSecret(localPublicKey, localPrivateKey string)
 	IsEmpty() bool
 	Public() string

@@ -4,7 +4,7 @@ import "sync"
 
 type Cache struct {
 	mu         sync.Mutex
-	data       map[string]string // хранит shared key по public key ключу
+	shared     string
 	pubKey     string
 	privateKey string
 }
@@ -12,7 +12,7 @@ type Cache struct {
 func New() *Cache {
 	return &Cache{
 		mu:         sync.Mutex{},
-		data:       make(map[string]string),
+		shared:     "",
 		pubKey:     "",
 		privateKey: "",
 	}

@@ -36,7 +36,7 @@ func (app *Application) GetMessages(ctx context.Context, request entity.GetMessa
 	if deciphered {
 		decipheredMessages := make([]entity.Message, 0)
 
-		sharedKey, err := app.cache.GetShared(request.MessageTo)
+		sharedKey, err := app.cache.GetShared()
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +70,7 @@ func (app *Application) GenerateKeys(remotePublicKey []byte) ([]byte, error) {
 	sharedKey := cryptography.GetSharedKey(remotePublicKey, localPrivateKey)
 
 	app.cache.SetSecret(string(localPublicKey), string(localPrivateKey.D.Bytes()))
-	app.cache.SaveShared(string(remotePublicKey), string(sharedKey))
+	app.cache.SaveShared(string(sharedKey))
 
 	return localPublicKey, nil
 }
