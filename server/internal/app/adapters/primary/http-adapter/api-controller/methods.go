@@ -126,9 +126,7 @@ func (ctr *ApiController) GenerateKeys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-
-	publicKey, err := ctr.app.GenerateKeys(ctx, []byte(dtoIn.PublicKey))
+	publicKey, err := ctr.app.GenerateKeys([]byte(dtoIn.PublicKey))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 
