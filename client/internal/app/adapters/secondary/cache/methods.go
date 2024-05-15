@@ -47,9 +47,3 @@ func (c *Cache) IsEmpty() bool {
 
 	return false
 }
-
-func (c *Cache) Public() string {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.pubKey
-}

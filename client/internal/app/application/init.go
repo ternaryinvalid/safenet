@@ -23,7 +23,6 @@ type cacheRepository interface {
 	GetShared() (string, error)
 	SetSecret(localPublicKey, localPrivateKey string)
 	IsEmpty() bool
-	Public() string
 }
 
 func New(cfg config.Application, serverProvider serverProvider, cacheRepository cacheRepository) *Application {
