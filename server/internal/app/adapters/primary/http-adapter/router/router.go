@@ -41,21 +41,15 @@ func (r *Router) AppendRoutesV1(controller *api_controller.ApiController) {
 	routes := []Route{
 		{
 			Name:    "get messages",
-			Path:    "/messages",
+			Path:    "/message/get",
 			Method:  http.MethodPost,
 			Handler: http.HandlerFunc(controller.GetMessages),
 		},
 		{
 			Name:    "send message",
-			Path:    "/send",
+			Path:    "/message/save",
 			Method:  http.MethodPost,
-			Handler: http.HandlerFunc(controller.SendMessage),
-		},
-		{
-			Name:    "generate keys",
-			Path:    "/generate-keys",
-			Method:  http.MethodGet,
-			Handler: http.HandlerFunc(controller.GenerateKeys),
+			Handler: http.HandlerFunc(controller.SaveMessage),
 		},
 	}
 

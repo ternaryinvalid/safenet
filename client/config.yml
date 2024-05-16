@@ -4,19 +4,20 @@ application:
 
 adapters:
   primary:
-    server:
-      port: ":8081"
+    httpAdapter:
+      server:
+        port: ":8000"
   secondary:
+    repositories:
+      cache:
+        filepath: "/bin/account.json"
     providers:
       serverProvider:
-        host: "http://server:8080"
+        host: "http://service-messages:3000"
         endpoints:
-          messages:
+          get:
             method: "POST"
-            path: "/api/v1/messages"
+            path: "/api/v1/message/get"
           send:
             method: "POST"
-            path: "/api/v1/send"
-          gen:
-            method: "POST"
-            path: "/api/v1/gen-keys"
+            path: "/api/v1/message/save"

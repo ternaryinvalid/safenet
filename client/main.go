@@ -16,7 +16,7 @@ func main() {
 
 	serverProvider := server_provider.New(config.Adapters.Secondary.Providers.ServerProvider)
 
-	cacheRepository := cache.New()
+	cacheRepository := cache.New(config.Adapters.Secondary.Repositories.Cache)
 
 	app := application.New(config.Application, serverProvider, cacheRepository)
 

@@ -20,7 +20,16 @@ type Primary struct {
 }
 
 type Secondary struct {
-	Providers Providers `yaml:"repositories"`
+	Providers    Providers    `yaml:"providers"`
+	Repositories Repositories `yaml:"repositories"`
+}
+
+type Repositories struct {
+	Cache Cache `yaml:"cache"`
+}
+
+type Cache struct {
+	Filepath string `yaml:"filepath"`
 }
 
 // PROVIDERS CONFIG
@@ -35,9 +44,8 @@ type ServerProvider struct {
 }
 
 type ServerProviderEndpoints struct {
-	Messages Endpoint `yaml:"messages"`
-	Send     Endpoint `yaml:"send"`
-	GenKeys  Endpoint `yaml:"gen"`
+	Get  Endpoint `yaml:"get"`
+	Send Endpoint `yaml:"send"`
 }
 
 type Endpoint struct {

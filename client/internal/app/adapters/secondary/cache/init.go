@@ -1,19 +1,15 @@
 package cache
 
-import "sync"
+import (
+	"github.com/ternaryinvalid/safenet/client/internal/app/domain/config"
+)
 
 type Cache struct {
-	mu         sync.Mutex
-	shared     string
-	pubKey     string
-	privateKey string
+	config config.Cache
 }
 
-func New() *Cache {
+func New(config config.Cache) *Cache {
 	return &Cache{
-		mu:         sync.Mutex{},
-		shared:     "",
-		pubKey:     "",
-		privateKey: "",
+		config: config,
 	}
 }

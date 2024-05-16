@@ -1,49 +1,40 @@
 package cache
 
 import (
-	"errors"
+	"encoding/json"
+	"github.com/ternaryinvalid/safenet/client/internal/app/domain/entity"
 	"log"
+	"os"
 )
 
-func (c *Cache) GetShared() (string, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if len(c.shared) == 0 {
-		err := errors.New("не найден транспортный ключ")
+func (c *Cache) SaveAccount(account *entity.Account) error {
+	log.Println(os.Getwd())
+	log.Println(c.config.Filepath)
 
-		return "", err
+	jsonData, err := json.Marshal(account)
+	if err != nil {
+		return err
 	}
 
-	return c.shared, nil
-}
-
-func (c *Cache) SaveShared(sharedSecret string) {
-	c.mu.Lock()
-	c.shared = sharedSecret
-	c.mu.Unlock()
-
-	log.Println("записан транспортный ключ в кэш")
-}
-
-func (c *Cache) SetSecret(localPublicKey, localPrivateKey string) {
-	c.mu.Lock()
-	c.pubKey = localPublicKey
-	c.privateKey = localPrivateKey
-	c.mu.Unlock()
-}
-
-func (c *Cache) GetSecret() string {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.privateKey
-}
-
-func (c *Cache) IsEmpty() bool {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if len(c.pubKey) == 0 || len(c.privateKey) == 0 {
-		return true
+	err = os.WriteFile(c.config.Filepath, jsonData, 0600)
+	if err != nil {
+		return err
 	}
 
-	return false
+	return nil
+}
+
+func (c *Cache) LoadAccount() (*entity.Account, error) {
+	jsonData, err := os.ReadFile(c.config.Filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	var account entity.Account
+	err = json.Unmarshal(jsonData, &account)
+	if err != nil {
+		return nil, err
+	}
+
+	return &account, nil
 }

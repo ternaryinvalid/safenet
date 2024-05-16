@@ -5,104 +5,144 @@ import (
 	"fmt"
 	"github.com/ternaryinvalid/safenet/client/internal/app/domain/entity"
 	"github.com/ternaryinvalid/safenet/client/internal/pkg/cryptography"
+	"log"
 )
 
-func (app *Application) SendMessage(ctx context.Context, request entity.SaveMessageDTO) (_ int64, err error) {
-	sharedKey := make([]byte, 0)
+func (app *Application) SendMessage(ctx context.Context, message entity.MessageSendDTO) (_ int64, err error) {
+	account, err := app.cacheRepository.LoadAccount()
+	if err != nil {
+		err = fmt.Errorf("аккаунт не создан")
 
-	if app.cacheRepository.IsEmpty() {
-		sharedKey, err = app.generateKeys(ctx)
-		if err != nil {
-			return 0, err
-		}
+		return 0, err
 	}
 
-	cipheredMessage, err := cryptography.Decrypt(sharedKey, []byte(request.MessageData))
+	sharedKey, err := cryptography.GetTransportKey(account.PrivateKey, message.MessageTo)
 	if err != nil {
 		return 0, err
 	}
 
-	cipheredDto := entity.SaveMessageDTO{
-		MessageTo:   request.MessageTo,
-		MessageFrom: request.MessageFrom,
+	cipheredMessage, err := cryptography.Encrypt(message.MessageData, string(sharedKey))
+	if err != nil {
+		return 0, err
+	}
+
+	cipheredDto := entity.MessageSendDTO{
+		MessageTo:   message.MessageTo,
+		MessageFrom: message.MessageFrom,
 		MessageData: cipheredMessage,
 	}
 
 	id, err := app.serverProvider.SendMessage(ctx, cipheredDto)
 	if err != nil {
-		return id, err
+		return 0, err
 	}
 
 	return id, nil
 }
 
-func (app *Application) GetMessages(ctx context.Context, request entity.GetMessagesDTO) ([]entity.Message, error) {
-	if app.cacheRepository.IsEmpty() {
-		err := fmt.Errorf("нет транспортного ключа")
+func (app *Application) GetMessages(ctx context.Context) ([]entity.Message, error) {
+	account, err := app.cacheRepository.LoadAccount()
+	if err != nil {
+		err = fmt.Errorf("аккаунт не создан")
 
 		return nil, err
 	}
 
-	messages, err := app.serverProvider.GetMessages(ctx, request)
+	log.Println(account.PublicKey)
+
+	dto := entity.MessagesGetDTO{
+		MessageTo: account.PublicKey,
+	}
+
+	messages, err := app.serverProvider.GetMessages(ctx, dto)
 	if err != nil {
 		return nil, err
 	}
 
-	var deciphered bool
-	if request.Deciphered == nil {
-		*request.Deciphered = false
-	}
-	deciphered = *request.Deciphered
+	decipheredMessages := make([]entity.Message, 0)
 
-	if !deciphered {
-		messagesDeciphered := make([]entity.Message, 0)
-
-		sharedKey, err := app.cacheRepository.GetShared()
+	for _, message := range messages {
+		sharedKey, err := cryptography.GetTransportKey(account.PrivateKey, message.MessageFrom)
 		if err != nil {
 			return nil, err
 		}
 
-		var encryptedData string
-
-		for _, message := range messages {
-			err := cryptography.Encrypt([]byte(sharedKey), []byte(message.MessageData), &encryptedData)
-			if err != nil {
-				return nil, err
-			}
-
-			messageDeciphered := entity.Message{
-				MessageFrom: message.MessageFrom,
-				MessageData: encryptedData,
-			}
-
-			messagesDeciphered = append(messagesDeciphered, messageDeciphered)
+		decryptedData, err := cryptography.Decrypt(message.MessageData, string(sharedKey))
+		if err != nil {
+			return nil, err
 		}
 
-		return messagesDeciphered, nil
+		decipheredMessage := entity.Message{
+			MessageFrom: message.MessageFrom,
+			MessageData: decryptedData,
+			Dt:          message.Dt,
+		}
+
+		decipheredMessages = append(decipheredMessages, decipheredMessage)
 	}
 
-	return messages, nil
+	return decipheredMessages, nil
 }
 
-func (app *Application) generateKeys(ctx context.Context) ([]byte, error) {
-	localPublicKey, localPrivateKey, err := cryptography.GenerateKeys()
+func (app *Application) CreateAccount(req entity.AccountCreateDTO) (entity.AccountResponseDTO, error) {
+	acc, err := app.cacheRepository.LoadAccount()
+	if err == nil {
+		if acc.Name == req.Name {
+			err = fmt.Errorf("аккаунт уже создан.")
+
+			return entity.AccountResponseDTO{}, err
+		}
+	}
+
+	if req.PrivateKey == nil {
+		public, private, err := cryptography.GenerateKeys()
+		if err != nil {
+			return entity.AccountResponseDTO{}, err
+		}
+
+		account := entity.Account{
+			Name:       req.Name,
+			PublicKey:  public,
+			PrivateKey: private,
+		}
+
+		response, err := app.createAccount(account)
+		if err != nil {
+			return entity.AccountResponseDTO{}, err
+		}
+
+		return response, nil
+	}
+
+	public, err := cryptography.GetPublicKeyAndAddressByPrivateKey(*req.PrivateKey)
 	if err != nil {
-		return nil, err
+		return entity.AccountResponseDTO{}, err
 	}
 
-	dto := entity.GenerateKeysDTO{
-		PublicKey: string(localPublicKey),
+	account := entity.Account{
+		Name:       req.Name,
+		PublicKey:  public,
+		PrivateKey: *req.PrivateKey,
 	}
 
-	remotePublicKey, err := app.serverProvider.GenerateKeys(ctx, dto)
+	response, err := app.createAccount(account)
 	if err != nil {
-		return nil, err
+		return entity.AccountResponseDTO{}, err
 	}
 
-	shared := cryptography.GetSharedKey([]byte(remotePublicKey.PublicKey), localPrivateKey)
+	return response, nil
+}
 
-	app.cacheRepository.SaveShared(string(shared))
-	app.cacheRepository.SetSecret(string(localPublicKey), string(localPrivateKey.D.Bytes()))
+func (app *Application) createAccount(account entity.Account) (entity.AccountResponseDTO, error) {
+	err := app.cacheRepository.SaveAccount(&account)
+	if err != nil {
+		return entity.AccountResponseDTO{}, err
+	}
 
-	return shared, nil
+	accountDto := entity.AccountResponseDTO{
+		Name:      account.Name,
+		PublicKey: account.PublicKey,
+	}
+
+	return accountDto, nil
 }

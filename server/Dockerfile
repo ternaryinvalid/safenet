@@ -18,5 +18,6 @@ FROM alpine:latest AS final
 COPY --from=build /bin/server /bin/
 COPY --from=build /bin/config.yml /bin/config.yml
 
-EXPOSE 8081
+EXPOSE 3000
+
 ENTRYPOINT [ "/bin/server" ]

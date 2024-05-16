@@ -3,14 +3,13 @@ package api_controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ternaryinvalid/safenet/server/internal/app/domain/entity"
 	"log"
 	"net/http"
-
-	"github.com/ternaryinvalid/safenet/server/internal/app/domain/entity"
 )
 
-func (ctr *ApiController) SendMessage(w http.ResponseWriter, r *http.Request) {
-	var dto entity.SaveMessageDTO
+func (ctr *ApiController) SaveMessage(w http.ResponseWriter, r *http.Request) {
+	var dto entity.MessageSaveDTO
 
 	err := json.NewDecoder(r.Body).Decode(&dto)
 	if err != nil {
@@ -60,7 +59,7 @@ func (ctr *ApiController) SendMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctr *ApiController) GetMessages(w http.ResponseWriter, r *http.Request) {
-	var dtoIn entity.GetMessagesDTO
+	var dtoIn entity.MessagesGetDTO
 
 	err := json.NewDecoder(r.Body).Decode(&dtoIn)
 	if err != nil {
@@ -92,55 +91,7 @@ func (ctr *ApiController) GetMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dtoOut := GetMessagesResponse{Messages: messages}
-
-	err = json.NewEncoder(w).Encode(dtoOut)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-
-		_, writeErr := w.Write([]byte(fmt.Sprintf("error: %v", err)))
-		if writeErr != nil {
-			log.Println(writeErr)
-
-			return
-		}
-
-		return
-	}
-}
-
-func (ctr *ApiController) GenerateKeys(w http.ResponseWriter, r *http.Request) {
-	var dtoIn GenerateKeysDTO
-
-	err := json.NewDecoder(r.Body).Decode(&dtoIn)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-
-		_, writeErr := w.Write([]byte(fmt.Sprintf("error: %v", err)))
-		if writeErr != nil {
-			log.Println(writeErr)
-
-			return
-		}
-
-		return
-	}
-
-	publicKey, err := ctr.app.GenerateKeys([]byte(dtoIn.PublicKey))
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-
-		_, writeErr := w.Write([]byte(fmt.Sprintf("error: %v", err)))
-		if writeErr != nil {
-			log.Println(writeErr)
-
-			return
-		}
-
-		return
-	}
-
-	dtoOut := GenerateKeysDTO{PublicKey: string(publicKey)}
+	dtoOut := toResponse(messages)
 
 	err = json.NewEncoder(w).Encode(dtoOut)
 	if err != nil {
@@ -158,13 +109,34 @@ func (ctr *ApiController) GenerateKeys(w http.ResponseWriter, r *http.Request) {
 }
 
 type GetMessagesResponse struct {
-	Messages []entity.Message `json:"messages"`
+	Messages []MessageResponse `json:"messages"`
+}
+
+type MessageResponse struct {
+	MessageFrom string `json:"message_from"`
+	MessageData string `json:"message_data"`
+	Dt          string `json:"dt"`
+}
+
+func toResponse(messages []entity.Message) GetMessagesResponse {
+	var (
+		resp    GetMessagesResponse
+		message MessageResponse
+	)
+
+	for _, m := range messages {
+		message = MessageResponse{
+			MessageFrom: m.MessageFrom,
+			MessageData: m.MessageData,
+			Dt:          m.Dt.Format("2006-01-12"),
+		}
+
+		resp.Messages = append(resp.Messages, message)
+	}
+
+	return resp
 }
 
 type SaveMessageResponse struct {
 	MessageId int64 `json:"message_id"`
-}
-
-type GenerateKeysDTO struct {
-	PublicKey string `json:"public_key"`
 }

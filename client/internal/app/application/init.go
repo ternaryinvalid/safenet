@@ -13,16 +13,13 @@ type Application struct {
 }
 
 type serverProvider interface {
-	SendMessage(ctx context.Context, request entity.SaveMessageDTO) (int64, error)
-	GetMessages(ctx context.Context, request entity.GetMessagesDTO) ([]entity.Message, error)
-	GenerateKeys(ctx context.Context, request entity.GenerateKeysDTO) (entity.GenerateKeysDTO, error)
+	SendMessage(ctx context.Context, message entity.MessageSendDTO) (int64, error)
+	GetMessages(ctx context.Context, address entity.MessagesGetDTO) ([]entity.Message, error)
 }
 
 type cacheRepository interface {
-	SaveShared(sharedSecret string)
-	GetShared() (string, error)
-	SetSecret(localPublicKey, localPrivateKey string)
-	IsEmpty() bool
+	LoadAccount() (*entity.Account, error)
+	SaveAccount(account *entity.Account) error
 }
 
 func New(cfg config.Application, serverProvider serverProvider, cacheRepository cacheRepository) *Application {

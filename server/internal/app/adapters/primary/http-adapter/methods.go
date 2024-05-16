@@ -2,11 +2,12 @@ package http_adapter
 
 import (
 	"context"
+	"fmt"
 	"log"
 )
 
 func (a *HttpAdapter) Start() {
-	startMsg := "Сервер запущен."
+	startMsg := fmt.Sprint("Сервер запущен на", a.config.Server.Port)
 
 	log.Println(startMsg)
 

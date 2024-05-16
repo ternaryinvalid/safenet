@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/ternaryinvalid/safenet/server/internal/app/adapters/secondary/repositories/cache"
 	"log"
 
 	http_adapter "github.com/ternaryinvalid/safenet/server/internal/app/adapters/primary/http-adapter"
@@ -16,9 +15,7 @@ func main() {
 
 	messagesRepository := message_repository.New(config.Adapters.Secondary.Databases.Messages)
 
-	cache := cache.New()
-
-	app := application.New(config.Application, messagesRepository, cache)
+	app := application.New(config.Application, messagesRepository)
 
 	httpAdapter := http_adapter.New(config.Adapters.Primary.HttpAdapter, app)
 

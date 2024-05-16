@@ -4,8 +4,9 @@ application:
 
 adapters:
   primary:
-    server:
-      port: ":8080"
+    httpAdapter:
+      server:
+        port: ":3000"
   secondary:
     databases:
       messages:
