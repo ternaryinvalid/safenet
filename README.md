@@ -1,12 +1,12 @@
 # Welcome to SAFE.NET
 
-## About project:
+## 1. About project:
 * **SAFE.NET** is a project that is designed to provide a secure and reliable way to store and transfer data.
 * The project is based on GoLang and uses the Diffie-Hellman key exchange algorithm to encrypt and decrypt data.
 * The project is designed to be used in conjunction with the SAFE.NET client, which is a simple and easy-to-use application that allows users to store and transfer data securely.
 * Users know only their own private key and public key of the recipient. The server does not store any data, only the public keys of the users.
 
-## Getting started:
+## 2. Getting started:
 
 To get started with the project, you will need to install the SAFE.NET client and server on your computer.
 ```sh
@@ -20,37 +20,68 @@ docker-compose up -d
 
 After that you can enjoy the project :)
 
-## API Documentation:
+## 3. API Documentation:
 
-### Methods
+### 3.1 Methods
 
-**Save Message**
+**3.1.1 Send Message**
 
 **URL:**
-    `http://localhost:8081/api/v1/send`
-
-**METHOD:** POST
+    `http://localhost:8000/api/v1/message/send`
 
 Request body:
-```json
+```json5
 {
-    "public_key_to": "0x4283104b22a688f347b946462cd62711ef68151deab79845f77fb365f15c0be4",
-    "message": "Hello, World!"
+  "message_to":"04a3c57ef403154129402c18ed243ab0d9ff79cbe229da39cbe229da308e079d965361ce2f3a771276f8e04692710dd393ef4b659784093ef4b6597840be2e2ac2a1", // публичный ключ получателя
+  "message_from":"04a3ca44f40315412689f0825a59402c18ed243ab0d9ff79cbe229da308e079d965361ce2f3a771276f8e04692710dd393ef4b6597840be2e28781e18ae5f1aca5", // публичный ключ отправителя
+  "message_data":"Hello, Bob!"
 }
 ```
 
-**Get Messages**
+Response Body
+```json5
+{
+  "message_id": 1 // уведомление об успешной записи
+}
+```
+
+**3.1.2 Create Account**
 
 **URL:**
-    `http://localhost:8081/api/v1/messages`
+`http://localhost:8000/api/v1/account/create`
 
 **METHOD:** POST
 
 Request body:
 ```json
 {
-    "public_key": "0x4283104b22a688f347b946462cd62711ef68151deab79845f77fb365f15c0be4",
-    "limit": 10 // Optional, if you dont set limit, it will return all messages
+  "name": "Alice",
+  "private_key": "ff791d94aef0efb5f0466b21e8391f68157f798c4555282a996eef957482965a" // опциональное поле для генерации собственных ключей
+}
+```
+
+**3.1.3 Get Messages**
+
+**URL:**
+    `http://localhost:8000/api/v1/message/get`
+
+**METHOD:** GET
+
+Response body:
+```json
+{
+    "messages": [
+      {
+        "message_from": "0sad1ffe6c2bf123ew", // public key отправителя
+        "message_data": "Hello, Bob!",
+        "dt": "2024-05-10" // дата отправки сообщения
+      },
+      {
+        "message_from": "aff123eee3981", // public key отправителя
+        "message_data": "Hello, Alice!",
+        "dt": "2024-05-12" // дата отправки сообщения
+      }
+    ]
 }
 ```
 
