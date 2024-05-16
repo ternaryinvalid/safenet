@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  service-client:
+    container_name: service-client
+    restart: always
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    depends_on:
+      - service-messages
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  service-messages:
+    container_name: service-messages
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:13.0
+    container_name: pgsql
+    restart: on-failure
+    environment:
+      POSTGRES_DB: 'messages'
+      POSTGRES_USER: 'user_admin'
+      POSTGRES_PASSWORD: 'admin123'
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./server/migrations/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./data/postgresql:/var/lib/postgresql/data
+    ports:
+      - "5588:5432"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
