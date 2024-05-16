@@ -53,10 +53,12 @@ Response Body
 **METHOD:** POST
 
 Request body:
-```json
+```json5
 {
   "name": "Alice",
-  "private_key": "ff791d94aef0efb5f0466b21e8391f68157f798c4555282a996eef957482965a" // опциональное поле для генерации собственных ключей
+  "private_key": "ff791def957482965a"// опциональное поле 
+                                    //для генерации 
+                                    //собственных ключей
 }
 ```
 
@@ -68,12 +70,12 @@ Request body:
 **METHOD:** GET
 
 Response body:
-```json
+```json5
 {
     "messages": [
       {
         "message_from": "0sad1ffe6c2bf123ew", // public key отправителя
-        "message_data": "Hello, Bob!",
+        "message_data": "Hello, Bob!", 
         "dt": "2024-05-10" // дата отправки сообщения
       },
       {
