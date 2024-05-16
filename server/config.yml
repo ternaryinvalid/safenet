@@ -1,0 +1,21 @@
+application:
+  name: "safe-net-server"
+  version: "1.0.0"
+
+adapters:
+  primary:
+    httpAdapter:
+      server:
+        port: ":3000"
+  secondary:
+    databases:
+      messages:
+        host: "pgsql"
+        port: "5432"
+        type: "postgres"
+        name: "messages"
+        user: "user_admin"
+        password: "admin123"
+        procedures:
+          getMessages: "messages.messages_get"
+          saveMessage: "messages.message_create"
