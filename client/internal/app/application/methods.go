@@ -95,7 +95,7 @@ func (app *Application) CreateAccount(req entity.AccountCreateDTO) (entity.Accou
 	}
 
 	if req.PrivateKey == nil {
-		public, private, err := cryptography.GenerateKeys()
+		private, public, err := cryptography.GenerateKeys()
 		if err != nil {
 			return entity.AccountResponseDTO{}, err
 		}
